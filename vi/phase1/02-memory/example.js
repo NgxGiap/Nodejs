@@ -75,11 +75,11 @@ function updateUser(users, name, newData) {
 }
 
 const users1 = [
-  { name: "An", age: 20 },
-  { name: "Bình", age: 25 },
+  { name: "An", age: 20, address: { city: "Hanoi" } },
+  { name: "Bình", age: 25, address: { city: "HCMC" } },
 ];
 
-const result1 = updateUser(users1, "An", { age: 21 });
+const result1 = updateUser(users1, "An", { age: 21, address: { city: "Nam Dinh" } });
 
 console.log("Update User:");
 console.log("Original:", users1); // không đổi
@@ -104,11 +104,11 @@ function updateUserWithClone(users, name, newData) {
 }
 
 const users2 = [
-  { name: "An", age: 20 },
-  { name: "Bình", age: 25 },
+  { name: "An", age: 20, address: { city: "Hanoi" } },
+  { name: "Bình", age: 25, address: { city: "HCMC" } },
 ];
 
-const result2 = updateUserWithClone(users2, "An", { age: 21 });
+const result2 = updateUserWithClone(users2, "An", { age: 21, address: { city: "Nam Dinh" } });
 
 console.log("Update User (Deep Clone):");
 console.log("Original:", users2);
