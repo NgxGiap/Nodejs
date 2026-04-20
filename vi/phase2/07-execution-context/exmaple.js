@@ -1,86 +1,153 @@
-// ============================================================
-// 07 — Execution Context & Event Loop
-// ============================================================
+/**
+ * =========================================
+ * 1. Call Stack (LIFO)
+ * =========================================
+ */
 
-// --- 1. Minh họa Call Stack ---
-console.log("=== CALL STACK ===");
+function a() {
+  console.log("A");
+  b();
+  console.log("A end");
+}
 
-function c() { console.log("c() thực thi"); }
-function b() { c(); console.log("b() thực thi"); }
-function a() { b(); console.log("a() thực thi"); }
+function b() {
+  console.log("B");
+}
 
 a();
-// Thứ tự in: c → b → a (LIFO)
 
-// --- 2. Thứ tự thực thi: Sync → Microtask → Macrotask ---
-console.log("\n=== THỨ TỰ THỰC THI ===");
+/**
+ * =========================================
+ * 2. Macrotask: setTimeout
+ * =========================================
+ */
 
-console.log("1. Sync: Bắt đầu");
+console.log("Start");
 
 setTimeout(() => {
-  console.log("5. Macrotask: setTimeout 0ms");
+  console.log("Timeout");
+}, 0);
+
+console.log("End");
+
+/**
+ * =========================================
+ * 3. Microtask: Promise
+ * =========================================
+ */
+
+console.log("Start");
+
+Promise.resolve().then(() => {
+  console.log("Promise");
+});
+
+console.log("End");
+
+/**
+ * =========================================
+ * 4. Microtask vs Macrotask
+ * =========================================
+ */
+
+console.log("Start");
+
+setTimeout(() => {
+  console.log("Timeout");
 }, 0);
 
 Promise.resolve().then(() => {
-  console.log("3. Microtask: Promise.then");
+  console.log("Promise");
 });
 
-process.nextTick(() => {
-  console.log("2. Microtask: process.nextTick (ưu tiên cao nhất)");
-});
+console.log("End");
 
-console.log("4. Sync: Kết thúc");
+/**
+ * =========================================
+ * 5. Multiple Tasks
+ * =========================================
+ */
 
-// Output theo thứ tự:
-// 1 → 4 → 2 → 3 → 5
-// (Sync → nextTick → Promise → setTimeout)
+console.log("Start");
 
-// --- 3. Microtasks chạy hết trước Macrotask tiếp theo ---
 setTimeout(() => {
-  console.log("\n=== MACROTASK CHẠY ===");
-  console.log("Macrotask thực thi");
+  console.log("Timeout 1");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("Promise 1");
+});
+
+setTimeout(() => {
+  console.log("Timeout 2");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("Promise 2");
+});
+
+console.log("End");
+
+/**
+ * =========================================
+ * 6. Nested Tasks
+ * =========================================
+ */
+
+console.log("Start");
+
+setTimeout(() => {
+  console.log("Timeout");
 
   Promise.resolve().then(() => {
-    console.log("Microtask BÊN TRONG macrotask (chạy ngay sau macrotask này)");
+    console.log("Promise inside Timeout");
   });
+}, 0);
 
+Promise.resolve().then(() => {
+  console.log("Promise");
+});
+
+console.log("End");
+
+/**
+ * =========================================
+ * 7. Advanced Event Loop
+ * =========================================
+ */
+
+console.log("1");
+
+setTimeout(() => {
+  console.log("2");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("3");
+});
+
+Promise.resolve().then(() => {
   setTimeout(() => {
-    console.log("Macrotask tiếp theo (chạy sau microtask bên trên)");
+    console.log("4");
   }, 0);
-}, 100);
+});
 
-// --- 4. Stack Overflow ---
-// Gọi đệ quy vô hạn sẽ làm đầy Call Stack
-function recursive(n) {
-  if (n <= 0) return "done";
-  return recursive(n - 1);
-}
+console.log("5");
 
-try {
-  // recursive(100000); // ❌ Uncommment để thấy RangeError: Maximum call stack size exceeded
-  console.log("\n(Bỏ comment dòng trên để thấy Stack Overflow)");
-} catch (e) {
-  console.error("Stack Overflow:", e.message);
-}
+/**
+ * =========================================
+ * 8. process.nextTick
+ * =========================================
+ */
 
-// --- 5. Giải quyết heavy computation với setImmediate ---
-// Chia nhỏ task nặng để không block Event Loop
-function heavyTask(items, callback) {
-  let index = 0;
-  function processChunk() {
-    const end = Math.min(index + 100, items.length);
-    while (index < end) {
-      // xử lý items[index]
-      index++;
-    }
-    if (index < items.length) {
-      setImmediate(processChunk); // Nhường quyền cho event loop
-    } else {
-      callback("Hoàn thành!");
-    }
-  }
-  processChunk();
-}
+console.log("Start");
 
-const bigArray = new Array(250).fill(0).map((_, i) => i);
-heavyTask(bigArray, (msg) => console.log("\nheavyTask:", msg));
+process.nextTick(() => {
+  console.log("nextTick");
+});
+
+Promise.resolve().then(() => {
+  console.log("Promise");
+});
+
+console.log("End");
